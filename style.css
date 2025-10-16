@@ -1,0 +1,50 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #242333;
+    color: wheat;
+    gap: 20px;
+}
+
+.palabra-adivinar {
+    display: flex;
+    gap: 20px;
+    font-size: 3rem;
+}
+
+.abecedario {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px 860px;
+    gap: 5px;
+    justify-content: center;
+}
+
+.letra {
+    background-color: #484755;
+    width: 20px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.letra:hover {
+    scale: 1.2;
+}
+
+.correcto {
+    background-color: green;
+}
+
+.incorrecto {
+    background-color: red;
+}
