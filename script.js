@@ -5,12 +5,17 @@ const campoPalabraAdivinar = document.querySelector('.palabra-adivinar');
 const abecedario = document.querySelector('.abecedario');
 const numeroErrores = document.getElementById('numero-errores');
 const letras = document.querySelectorAll('.letra:not(.error .correcto)');
+const modalNombreUsuario = document.getElementById('container-jugador');
+const formularioNombre = document.getElementById('formulario-nombre');
+const nombreUsuario = document.getElementById('nombre-usuario').value
 const letrasCorrectas = [];
 const botonGanar = document.querySelector('.modal-ganar button');
 const botonPerder = document.querySelector('.modal-perder button');
+let ranking = JSON.parse(localStorage.getItem("ranking")) || {"jugadores":[]};
 let cronometroIniciado = false;
 let intervalo;
-
+let segundosTotales = 0;
+console.log(ranking);
 
 // FUNCIONES
 
@@ -18,7 +23,7 @@ let intervalo;
 function llenarCampoPalabraAdivinar() {
     // GUARDO LA LONGITUD DE LA PALABRA OCULTA PARA EL FOR
     let longitudPalabraOculta = palabraOculta.length;
-    /* EN EESTE FOR HAGO QUE POR CADA ITERACIÓN SE TENGA QUE CREAR UN ELEMENTO "p", DESPUES COLGARA DE EL CONTENEDOR DE LA PALABRA ADVIINAR Y PARA FINALIZAR LA
+    /* EN EESTE FOR HAGO QUE POR CADA ITERACIÓN SE TENGA QUE CREAR UN ELEMENTO "p", DESPUES ESTA "p" APPEND DE EL CONTENEDOR DE LA PALABRA ADVIINAR Y PARA FINALIZAR LA
         "p" TENDRA COMO TEXTO UN GUIÓN BAJO.
     */
     for (let i = 0; i < longitudPalabraOculta; i++){
@@ -31,7 +36,6 @@ function llenarCampoPalabraAdivinar() {
 // FUNCION PARA INCIIAR EL CRONOMETRO
 function iniciarCronometro() {
     cronometroIniciado = true;
-    let segundosTotales = 0;
     intervalo = setInterval(() => {
         segundosTotales++;
         let horas = Math.floor(segundosTotales / 3600);
@@ -50,6 +54,7 @@ function detenerCronometro() {
     cronometroIniciado = false;
 }
 
+// FUNCION PARA ACTUALIZAR LOS NÚMERO DE ERRORES Y NÚMERO DE INTENTOS
 function actualizarErrores(numeroActualErrores) {
     numeroErrores.innerText = numeroActualErrores + 1;
 
@@ -78,7 +83,6 @@ function palabraCorrecta(letraIntroducida, posicion){
             letraActual.innerText = letraIntroducida.innerText
         }
     });
-
     
     if (letrasCorrectas.length === palabraOculta.length) {
         ganar();
@@ -102,16 +106,37 @@ function palabraIncorrecta(letra) {
 }
 
 function ganar() {
+    guardarResultado("ganado");
     detenerCronometro();
     document.querySelector(".ganar").classList.add("visible")
 }
 
 function perder() {
+    guardarResultado("perdido");
     detenerCronometro();
     document.querySelector(".perder").classList.add("visible")
 }
 
+function guardarResultado(estado) {
+    let existeUsuario = ranking.jugadores.forEach((usuario, index) => {
+        if(usuario.nombre === nombreUsuario) return index;
+    })
+    if (!existeUsuario) {
+        ranking.jugadores.push({"usuario":nombreUsuario, "estado":estado, "palabra":palabraOculta, "numeroErrores":numeroErrores, "tiempo":segundosTotales});
+        localStorage.setItem("ranking", JSON.stringify(ranking));
+    } else {
+
+    }
+
+console.log(ranking);
+}
+
 abecedario.addEventListener('click', (e) => {
+    
+    if(!cronometroIniciado) {
+        iniciarCronometro();
+    }
+
     if (e.target.classList.contains('letra')
         && !e.target.classList.contains('error')
         && !e.target.classList.contains('correcto')){
@@ -119,9 +144,6 @@ abecedario.addEventListener('click', (e) => {
         verificarLetra(e.target);
     }
 
-    if(!cronometroIniciado) {
-        iniciarCronometro();
-    }
 })
 
 botonGanar.addEventListener('click', () => {
@@ -132,5 +154,9 @@ botonPerder.addEventListener('click', () => {
     location.reload();
 })
 
+formularioNombre.addEventListener('submit', (e) => {
+    e.preventDefault();
+    modalNombreUsuario.style.display = "none"
+})
 
 llenarCampoPalabraAdivinar();
