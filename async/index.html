@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de Deportes Síncrona / Asíncrona</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Tienda de Artículos Deportivos</h1>
+        <div>
+            <img src="/async/img/IMG_2060.jpg" width="100" height="200" alt="">
+        </div>
+        <p>Gestionar los productos de la tienda y aprende sobre asíncronia (o no)</p>
+    </header>
+
+    <main>
+        <section id="product-list">
+            <h2>Productos disponibles</h2>
+            <div id="products">
+
+            </div>
+        </section>
+        <section id="product-form">
+            <h2>Añadir producto</h2>
+            <form id="addProductForm">
+                <label for="product-name">Nombre del producto</label>
+                <input type="text" id ="product-name" required/>
+                <label for="product-price">Precio del producto</label>
+                <input type="number" id="product-price" required/>
+                <button type="submit">Añadir</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>Práctica sobre programación asíncrona en JavaScript</p>
+    </footer>
+    <script src="script-async.js"></script>
+</body>
+</html>

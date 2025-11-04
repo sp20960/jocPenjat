@@ -23,22 +23,22 @@ console.log(ranking);
 function llenarCampoPalabraAdivinar() {
     // GUARDO LA LONGITUD DE LA PALABRA OCULTA PARA EL FOR
     let longitudPalabraOculta = palabraOculta.length;
-    /* EN EESTE FOR HAGO QUE POR CADA ITERACIÓN SE TENGA QUE CREAR UN ELEMENTO "p", DESPUES ESTA "p" APPEND DE EL CONTENEDOR DE LA PALABRA ADVIINAR Y PARA FINALIZAR LA
+    /* EN ESTE FOR HAGO QUE POR CADA ITERACIÓN SE TENGA QUE CREAR UN ELEMENTO "p", DESPUES ESTA "p" APPEND DE EL CONTENEDOR DE LA PALABRA ADVIINAR Y PARA FINALIZAR LA
         "p" TENDRA COMO TEXTO UN GUIÓN BAJO.
     */
     for (let i = 0; i < longitudPalabraOculta; i++){
-        let elemento = document.createElement('p')
-        campoPalabraAdivinar.append(elemento);
+        let elemento = document.createElement('p') // Creo un elemento p
+        campoPalabraAdivinar.append(elemento); // El elemento p lo anido al contenedor de la palabra oculta
         elemento.innerText = "_";
     }
 }
 
 // FUNCION PARA INCIIAR EL CRONOMETRO
 function iniciarCronometro() {
-    cronometroIniciado = true;
+    cronometroIniciado = true; //Indico que el coronometro ya esta iniciado para no vovler a iniciarlo
     intervalo = setInterval(() => {
-        segundosTotales++;
-        let horas = Math.floor(segundosTotales / 3600);
+        segundosTotales++; // Incremento los segundos por cada segundo que pasa
+        let horas = Math.floor(segundosTotales / 3600); 
         let minutos = Math.floor((segundosTotales % 3600) / 60);
         let segundos = segundosTotales % 60;
 
@@ -50,57 +50,62 @@ function iniciarCronometro() {
 }
 
 function detenerCronometro() {
+    // Paro el cronometro y incido que el cronometro esta en false para poder inciarlo otra vez en la siguiente partida
     clearInterval(intervalo);
     cronometroIniciado = false;
 }
 
 // FUNCION PARA ACTUALIZAR LOS NÚMERO DE ERRORES Y NÚMERO DE INTENTOS
-function actualizarErrores(numeroActualErrores) {
-    numeroErrores.innerText = numeroActualErrores + 1;
+function actualizarErrores() {
+    // Incremento los errores
+    numeroErrores.innerText = +numeroErrores.innerText + 1;
 
-    let intentosActuales = +numeroIntentos.innerText;
-    numeroIntentos.innerText = intentosActuales -1;
+    // Decremento los intentos 
+    numeroIntentos.innerText = +numeroIntentos.innerText - 1;
 
 }
 
 function verificarLetra(letra) {
     let letraSeleccionada = letra.innerText;
 
+    // Verificamos si la letra que hemos seleccionado es null
     if (letraSeleccionada !== null) {
-        let indice = palabraOculta.indexOf(letraSeleccionada);
-        (indice > -1) ? palabraCorrecta(letra, indice) : palabraIncorrecta(letra); 
+        let indice = palabraOculta.indexOf(letraSeleccionada); //Guardamos el resultado de indexOf si la letra seleccionada esta en palabraOculta
+        (indice > -1) ? palabraCorrecta(letra, indice) : palabraIncorrecta(letra);  // Si el indexOf devuelve mas que un -1 quiere decir que la letra es correcta sino incorrecta
     }
     
 }
 
 function palabraCorrecta(letraIntroducida, posicion){
-    letraIntroducida.classList.add('correcto')
-    letrasCorrectas.push(letraIntroducida);
+    letraIntroducida.classList.add('correcto') //A la letra le aplicamos el estilo de correcto (fondo en verde)
+    letrasCorrectas.push(letraIntroducida); //Meto la letra en el array de letras correctas
     
-    let letrasIntroducidas = document.querySelectorAll('.palabra-adivinar p');
+    let letrasIntroducidas = document.querySelectorAll('.palabra-adivinar p'); //Guardo en un node list las p que hay en el contenedor de palabra oculta
+    // Iteramos el node list para poder colocar la letra que hemos seleccionado en la posición que le toca
     letrasIntroducidas.forEach((letraActual, indice) => {
-        if (indice === posicion) {
-            letraActual.innerText = letraIntroducida.innerText
+        if (indice === posicion) { //Si el indice que es la posicion que se encuentra la letra que hemos encontrado coincide con en indice del node list que hemos guardado
+            letraActual.innerText = letraIntroducida.innerText // El texto de la "p" que originalmente es una barra baja se cambiara por la letra que hemos introducido
         }
     });
     
+    // Si la longitud del array de letras correctas es la misma que la palabra oculta, el usuario ha ganado
     if (letrasCorrectas.length === palabraOculta.length) {
         ganar();
     }
 }
 
 function palabraIncorrecta(letra) {
+    // Verificamos que la letra que hemos elegido no sea una que ya hemos introducido anteriormente
     if (!letra.classList.contains('incorrecto')){
 
-        letra.classList.add('incorrecto');
+        letra.classList.add('incorrecto'); // Le aplicamos el estilo de incorrecto (fondo rojo)
 
-         let numeroActualErrores = +numeroErrores.innerText;
 
-        if (numeroActualErrores === 3){
-            actualizarErrores(numeroActualErrores);
+        if (+numeroErrores.innerText === 3){
+            actualizarErrores();
             perder();
         } else {
-            actualizarErrores(numeroActualErrores);
+            actualizarErrores();
         } 
     }
 }
