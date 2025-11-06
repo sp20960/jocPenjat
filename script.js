@@ -63,6 +63,11 @@ function actualizarErrores() {
     // Decremento los intentos 
     numeroIntentos.innerText = +numeroIntentos.innerText - 1;
 
+    // Si el número de errores es igual a 4 pierdes
+    if(+numeroErrores.innerText === 4) {
+        perder();
+    }
+
 }
 
 function verificarLetra(letra) {
@@ -99,41 +104,33 @@ function palabraIncorrecta(letra) {
     if (!letra.classList.contains('incorrecto')){
 
         letra.classList.add('incorrecto'); // Le aplicamos el estilo de incorrecto (fondo rojo)
-
-
-        if (+numeroErrores.innerText === 3){
-            actualizarErrores();
-            perder();
-        } else {
-            actualizarErrores();
-        } 
+     
+        actualizarErrores();
     }
 }
 
 function ganar() {
     guardarResultado("ganado");
     detenerCronometro();
-    document.querySelector(".ganar").classList.add("visible")
+    document.querySelector(".ganar").classList.add("visible") // Añadimos la clase visivle al modal de ganar.
 }
 
 function perder() {
     guardarResultado("perdido");
     detenerCronometro();
-    document.querySelector(".perder").classList.add("visible")
+    document.querySelector(".perder").classList.add("visible") // Añadimos la clase visivle al modal de perder.
 }
 
 function guardarResultado(estado) {
-    let existeUsuario = ranking.jugadores.forEach((usuario, index) => {
-        if(usuario.nombre === nombreUsuario) return index;
+    let existeUsuario = ranking.jugadores.forEach((usuario) => { // Comprobamos si existe el usuario haciendo un foreach al ranking
+        if(usuario.nombre === nombreUsuario) return true;  //Si el nombre que hay en el ranking coincide con el que ha introducido el usuario devolvemos true
     })
+    // Si no existe el usuario hacemos un push al array ranking con la información de la partida realizada
     if (!existeUsuario) {
         ranking.jugadores.push({"usuario":nombreUsuario, "estado":estado, "palabra":palabraOculta, "numeroErrores":numeroErrores, "tiempo":segundosTotales});
         localStorage.setItem("ranking", JSON.stringify(ranking));
-    } else {
-
     }
-
-console.log(ranking);
+    //FALTA IMPLEMENTAR QUE SI USUARIO YA EXITSE ACTUALIZAR LA INFORMACIÓN SI TIENE UN MEJOR RESULTADO
 }
 
 abecedario.addEventListener('click', (e) => {
