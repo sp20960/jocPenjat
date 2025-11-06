@@ -1,13 +1,17 @@
 // GUARDAMOS TODAS LAS CONSTANTES Y VARIABLES GLOBALES QUE UTILIZAREMOS
-const palabraOculta = "BUSCAR";
+const diccionarioPalabras = ["amor", "amistad", "alegría", "aventura", "belleza", "cielo", "camino", "destino", 
+    "esfuerzo", "esperanza", "familia", "fuerza", "gracia", "hogar", "honor", "ilusión", 
+    "justicia", "libertad", "luz", "mar", "naturaleza", "nube", "paz", "perdón"];
+const palabraOculta = diccionarioPalabras[Math.floor(Math.random() * diccionarioPalabras.length)].toUpperCase();
 const numeroIntentos = document.getElementById('numero-intentos');
 const campoPalabraAdivinar = document.querySelector('.palabra-adivinar');
 const abecedario = document.querySelector('.abecedario');
 const numeroErrores = document.getElementById('numero-errores');
 const letras = document.querySelectorAll('.letra:not(.error .correcto)');
 const modalNombreUsuario = document.getElementById('container-jugador');
+const mensajeError = document.getElementById('mensaje-error');
 const formularioNombre = document.getElementById('formulario-nombre');
-const nombreUsuario = document.getElementById('nombre-usuario').value
+const nombreUsuario = document.getElementById('nombre-usuario');
 const letrasCorrectas = [];
 const botonGanar = document.querySelector('.modal-ganar button');
 const botonPerder = document.querySelector('.modal-perder button');
@@ -15,7 +19,7 @@ let ranking = JSON.parse(localStorage.getItem("ranking")) || {"jugadores": []};
 let cronometroIniciado = false;
 let intervalo;
 let segundosTotales = 0;
-
+console.log(palabraOculta);
 // FUNCIONES
 
 // FUNCION PARA RELLENAR CON GUIONES BAJOS EL CONTENEDOR DONDE SE IRA PONIENDO LAS LETRAS DE LA PALABRA OCULTA
@@ -30,6 +34,26 @@ function llenarCampoPalabraAdivinar() {
         campoPalabraAdivinar.append(elemento); // El elemento p lo anido al contenedor de la palabra oculta
         elemento.innerText = "_";
     }
+}
+
+
+function verificarLongitud() {
+    if (nombreUsuario.value.trim().length > 6 || nombreUsuario.value.trim().length <= 2) {
+        mensajeError.textContent = "Ha de contener un mínimo de 3 letras y un maximo de 6";
+        return false;
+    }
+    
+    return true;
+}
+
+function esObligatorio() {
+    console.log(nombreUsuario.value.trim().length);
+    if (nombreUsuario.value.trim().length === 0) {
+        mensajeError.textContent = "El campo es obligatorio"
+        return false;
+    }
+
+    return true;
 }
 
 // FUNCION PARA INCIIAR EL CRONOMETRO
@@ -51,6 +75,7 @@ function iniciarCronometro() {
     }, 1000) 
 }
 
+// FUNCION PARA DETENER EL CRONOMETRO
 function detenerCronometro() {
     // Paro el cronometro y incido que el cronometro esta en false para poder inciarlo otra vez en la siguiente partida
     clearInterval(intervalo);
@@ -72,18 +97,20 @@ function actualizarErrores() {
 
 }
 
+// FUNCION PARA VERIFICAR LA LETRA
 function verificarLetra(letra) {
     let letraSeleccionada = letra.innerText;
 
     // Verificamos si la letra que hemos seleccionado es null
     if (letraSeleccionada !== null) {
         let indice = palabraOculta.indexOf(letraSeleccionada); //Guardamos el resultado de indexOf si la letra seleccionada esta en palabraOculta
-        (indice > -1) ? palabraCorrecta(letra, indice) : palabraIncorrecta(letra);  // Si el indexOf devuelve mas que un -1 quiere decir que la letra es correcta sino incorrecta
+        (indice > -1) ? letraCorrecta(letra, indice) : letraIncorrecta(letra);  // Si el indexOf devuelve mas que un -1 quiere decir que la letra es correcta sino incorrecta
     }
     
 }
 
-function palabraCorrecta(letraIntroducida, posicion){
+// FUNCION CUANDO LA LETRA ES CORRECTA
+function letraCorrecta(letraIntroducida, posicion){
     letraIntroducida.classList.add('correcto') //A la letra le aplicamos el estilo de correcto (fondo en verde)
     letrasCorrectas.push(letraIntroducida); //Meto la letra en el array de letras correctas
     
@@ -101,7 +128,8 @@ function palabraCorrecta(letraIntroducida, posicion){
     }
 }
 
-function palabraIncorrecta(letra) {
+// FUNCION LETRA INCORRECTA
+function letraIncorrecta(letra) {
     // Verificamos que la letra que hemos elegido no sea una que ya hemos introducido anteriormente
     if (!letra.classList.contains('incorrecto')){
 
@@ -123,18 +151,21 @@ function perder() {
     document.querySelector(".perder").classList.add("visible") // Añadimos la clase visivle al modal de perder.
 }
 
+// FUNCIÓN PARA GUARDAR RESULTADO
 function guardarResultado(estado) {
     let existeUsuario = ranking.jugadores.forEach((usuario) => { // Comprobamos si existe el usuario haciendo un foreach al ranking
-        if(usuario.nombre === nombreUsuario) return true;  //Si el nombre que hay en el ranking coincide con el que ha introducido el usuario devolvemos true
+        if(usuario.nombre === nombreUsuario.value) return true;  //Si el nombre que hay en el ranking coincide con el que ha introducido el usuario devolvemos true
     })
     // Si no existe el usuario hacemos un push al array ranking con la información de la partida realizada
     if (!existeUsuario) {
-        ranking.jugadores.push({"usuario":nombreUsuario, "estado":estado, "palabra":palabraOculta, "numeroErrores":+numeroErrores.textContent, "tiempo":segundosTotales});
+        ranking.jugadores.push({"usuario":nombreUsuario.value, "estado":estado, "palabra":palabraOculta, "numeroErrores":+numeroErrores.textContent, "tiempo":segundosTotales});
         localStorage.setItem("ranking", JSON.stringify(ranking));
     }
     //FALTA IMPLEMENTAR QUE SI USUARIO YA EXITSE ACTUALIZAR LA INFORMACIÓN SI TIENE UN MEJOR RESULTADO
 }
 
+
+// EVENTOS
 abecedario.addEventListener('click', (e) => {
     
     if(!cronometroIniciado) {
@@ -160,7 +191,13 @@ botonPerder.addEventListener('click', () => {
 
 formularioNombre.addEventListener('submit', (e) => {
     e.preventDefault();
-    modalNombreUsuario.style.display = "none"
+    
+    
+    if (verificarLongitud() & esObligatorio()){
+        modalNombreUsuario.style.display = "none";
+        formularioNombre.reset();
+    }
 })
 
 llenarCampoPalabraAdivinar();
+

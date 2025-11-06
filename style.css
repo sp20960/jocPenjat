@@ -23,6 +23,10 @@ h1 {
     font-size: 4rem;
 }
 
+#mensaje-error {
+    color: rgb(155, 7, 7);
+}
+
 .palabra-adivinar {
     display: flex;
     gap: 20px;
@@ -122,6 +126,10 @@ h1 {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+#minutos, #horas, #segundos {
+    font-size: 1.5rem;
 }
 
 #container-jugador div form {
