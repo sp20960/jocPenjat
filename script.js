@@ -11,11 +11,10 @@ const nombreUsuario = document.getElementById('nombre-usuario').value
 const letrasCorrectas = [];
 const botonGanar = document.querySelector('.modal-ganar button');
 const botonPerder = document.querySelector('.modal-perder button');
-let ranking = JSON.parse(localStorage.getItem("ranking")) || {"jugadores":[]};
+let ranking = JSON.parse(localStorage.getItem("ranking")) || {"jugadores": []};
 let cronometroIniciado = false;
 let intervalo;
 let segundosTotales = 0;
-console.log(ranking);
 
 // FUNCIONES
 
@@ -41,7 +40,10 @@ function iniciarCronometro() {
         let horas = Math.floor(segundosTotales / 3600); 
         let minutos = Math.floor((segundosTotales % 3600) / 60);
         let segundos = segundosTotales % 60;
-
+        /* Todo esto lo he buscado por internet y lo que hace es que tengo separado con spans los segundos, horas  y minutos que tienes su propio id
+            luego modifico el contenido con el resultado de las operaciones hechas anteriormente guardadas en variables, sobre estas variables las convierto en strig para
+            poder aplicar el metodo padStart que te permite rellenar con 0 dando la longitud del string, y el valor con el que quieres rellenar
+        */
         document.getElementById("horas").textContent = horas.toString().padStart(2, '0');
         document.getElementById("minutos").textContent = minutos.toString().padStart(2, '0');
         document.getElementById("segundos").textContent = segundos.toString().padStart(2, '0');
@@ -127,7 +129,7 @@ function guardarResultado(estado) {
     })
     // Si no existe el usuario hacemos un push al array ranking con la información de la partida realizada
     if (!existeUsuario) {
-        ranking.jugadores.push({"usuario":nombreUsuario, "estado":estado, "palabra":palabraOculta, "numeroErrores":numeroErrores, "tiempo":segundosTotales});
+        ranking.jugadores.push({"usuario":nombreUsuario, "estado":estado, "palabra":palabraOculta, "numeroErrores":+numeroErrores.textContent, "tiempo":segundosTotales});
         localStorage.setItem("ranking", JSON.stringify(ranking));
     }
     //FALTA IMPLEMENTAR QUE SI USUARIO YA EXITSE ACTUALIZAR LA INFORMACIÓN SI TIENE UN MEJOR RESULTADO
