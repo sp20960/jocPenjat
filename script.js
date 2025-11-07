@@ -9,9 +9,10 @@ const abecedario = document.querySelector('.abecedario');
 const numeroErrores = document.getElementById('numero-errores');
 const letras = document.querySelectorAll('.letra:not(.error .correcto)');
 const modalNombreUsuario = document.getElementById('container-jugador');
+let nombreUsuario = "";
 const mensajeError = document.getElementById('mensaje-error');
 const formularioNombre = document.getElementById('formulario-nombre');
-const nombreUsuario = document.getElementById('nombre-usuario');
+const inputUsuario = document.getElementById('nombre-usuario');
 const letrasCorrectas = [];
 const botonGanar = document.querySelector('.modal-ganar button');
 const botonPerder = document.querySelector('.modal-perder button');
@@ -19,12 +20,14 @@ let ranking = JSON.parse(localStorage.getItem("ranking")) || {"jugadores": []};
 let cronometroIniciado = false;
 let intervalo;
 let segundosTotales = 0;
-console.log(palabraOculta);
 // FUNCIONES
+
+console.log(palabraOculta);
 
 // FUNCION PARA RELLENAR CON GUIONES BAJOS EL CONTENEDOR DONDE SE IRA PONIENDO LAS LETRAS DE LA PALABRA OCULTA
 function llenarCampoPalabraAdivinar() {
     // GUARDO LA LONGITUD DE LA PALABRA OCULTA PARA EL FOR
+
     let longitudPalabraOculta = palabraOculta.length;
     /* EN ESTE FOR HAGO QUE POR CADA ITERACIÓN SE TENGA QUE CREAR UN ELEMENTO "p", DESPUES ESTA "p" APPEND DE EL CONTENEDOR DE LA PALABRA ADVIINAR Y PARA FINALIZAR LA
         "p" TENDRA COMO TEXTO UN GUIÓN BAJO.
@@ -38,7 +41,7 @@ function llenarCampoPalabraAdivinar() {
 
 
 function verificarLongitud() {
-    if (nombreUsuario.value.trim().length > 6 || nombreUsuario.value.trim().length <= 2) {
+    if (inputUsuario.value.trim().length > 6 || inputUsuario.value.trim().length <= 2) {
         mensajeError.textContent = "Ha de contener un mínimo de 3 letras y un maximo de 6";
         return false;
     }
@@ -47,8 +50,7 @@ function verificarLongitud() {
 }
 
 function esObligatorio() {
-    console.log(nombreUsuario.value.trim().length);
-    if (nombreUsuario.value.trim().length === 0) {
+    if (inputUsuario.value.trim().length === 0) {
         mensajeError.textContent = "El campo es obligatorio"
         return false;
     }
@@ -112,13 +114,14 @@ function verificarLetra(letra) {
 // FUNCION CUANDO LA LETRA ES CORRECTA
 function letraCorrecta(letraIntroducida, posicion){
     letraIntroducida.classList.add('correcto') //A la letra le aplicamos el estilo de correcto (fondo en verde)
-    letrasCorrectas.push(letraIntroducida); //Meto la letra en el array de letras correctas
+     //Meto la letra en el array de letras correctas
     
     let letrasIntroducidas = document.querySelectorAll('.palabra-adivinar p'); //Guardo en un node list las p que hay en el contenedor de palabra oculta
-    // Iteramos el node list para poder colocar la letra que hemos seleccionado en la posición que le toca
-    letrasIntroducidas.forEach((letraActual, indice) => {
-        if (indice === posicion) { //Si el indice que es la posicion que se encuentra la letra que hemos encontrado coincide con en indice del node list que hemos guardado
-            letraActual.innerText = letraIntroducida.innerText // El texto de la "p" que originalmente es una barra baja se cambiara por la letra que hemos introducido
+    // Iteramos el la palabra oculta transofrmada en un array de caracteres
+    Array.from(palabraOculta).forEach((letraActual, indice) => {
+        if (letraActual === letraIntroducida.innerText) {
+            letrasIntroducidas[indice].innerText = letraIntroducida.innerText 
+            letrasCorrectas.push(letraIntroducida);
         }
     });
     
@@ -146,22 +149,34 @@ function ganar() {
 }
 
 function perder() {
-    guardarResultado("perdido");
     detenerCronometro();
     document.querySelector(".perder").classList.add("visible") // Añadimos la clase visivle al modal de perder.
 }
 
 // FUNCIÓN PARA GUARDAR RESULTADO
 function guardarResultado(estado) {
-    let existeUsuario = ranking.jugadores.forEach((usuario) => { // Comprobamos si existe el usuario haciendo un foreach al ranking
-        if(usuario.nombre === nombreUsuario.value) return true;  //Si el nombre que hay en el ranking coincide con el que ha introducido el usuario devolvemos true
-    })
+    let indiceUsuario;
+    let existeUsuario = ranking.jugadores.forEach((usuario, index) => { // Comprobamos si existe el usuario haciendo un foreach al ranking
+        if(usuario.nombre === nombreUsuario) {
+            indiceUsuario = index;
+            return true
+        };  //Si el nombre que hay en el ranking coincide con el que ha introducido el usuario devolvemos true
+    });
+    console.log(existeUsuario);
     // Si no existe el usuario hacemos un push al array ranking con la información de la partida realizada
     if (!existeUsuario) {
-        ranking.jugadores.push({"usuario":nombreUsuario.value, "estado":estado, "palabra":palabraOculta, "numeroErrores":+numeroErrores.textContent, "tiempo":segundosTotales});
+        ranking.jugadores.push({"nombre":nombreUsuario, "estado":estado, "palabra":palabraOculta, "numeroErrores":+numeroErrores.textContent, "tiempo":segundosTotales});
         localStorage.setItem("ranking", JSON.stringify(ranking));
+        return;
     }
-    //FALTA IMPLEMENTAR QUE SI USUARIO YA EXITSE ACTUALIZAR LA INFORMACIÓN SI TIENE UN MEJOR RESULTADO
+
+    let marcaAnterior = ranking.jugadores[indiceUsuario].tiempo;
+    if(marcaAnterior < segundosTotales) {
+        ranking.jugadores[indiceUsuario].palabra = palabraOculta;
+        ranking.jugadores[indiceUsuario].numeroErrores = +numeroErrores.textContent;
+        ranking.jugadores[indiceUsuario].tiempo = segundosTotales;
+        localStorage.setItem("ranking", JSON.stringify(ranking));
+    } 
 }
 
 
@@ -195,6 +210,7 @@ formularioNombre.addEventListener('submit', (e) => {
     
     if (verificarLongitud() & esObligatorio()){
         modalNombreUsuario.style.display = "none";
+        nombreUsuario = inputUsuario.value
         formularioNombre.reset();
     }
 })
