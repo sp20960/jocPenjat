@@ -41,7 +41,7 @@ function llenarCampoPalabraAdivinar() {
 
 
 function verificarLongitud() {
-    if (inputUsuario.value.trim().length > 6 || inputUsuario.value.trim().length <= 2) {
+    if (inputUsuario.value.trim().length > 8 || inputUsuario.value.trim().length <= 2) {
         mensajeError.textContent = "Ha de contener un mínimo de 3 letras y un maximo de 6";
         return false;
     }
@@ -101,27 +101,25 @@ function actualizarErrores() {
 
 // FUNCION PARA VERIFICAR LA LETRA
 function verificarLetra(letra) {
-    let letraSeleccionada = letra.innerText;
-
     // Verificamos si la letra que hemos seleccionado es null
-    if (letraSeleccionada !== null) {
-        let indice = palabraOculta.indexOf(letraSeleccionada); //Guardamos el resultado de indexOf si la letra seleccionada esta en palabraOculta
-        (indice > -1) ? letraCorrecta(letra, indice) : letraIncorrecta(letra);  // Si el indexOf devuelve mas que un -1 quiere decir que la letra es correcta sino incorrecta
+    if (letra !== null) {
+        let existeLetra = palabraOculta.indexOf(letra.innerText); //Guardamos el resultado de indexOf si la letra seleccionada esta en palabraOculta
+        (existeLetra > -1) ? letraCorrecta(letra) : letraIncorrecta(letra);  // Si el indexOf devuelve mas que un -1 quiere decir que la letra es correcta sino incorrecta
     }
     
 }
 
 // FUNCION CUANDO LA LETRA ES CORRECTA
-function letraCorrecta(letraIntroducida, posicion){
+function letraCorrecta(letraIntroducida){
     letraIntroducida.classList.add('correcto') //A la letra le aplicamos el estilo de correcto (fondo en verde)
      //Meto la letra en el array de letras correctas
     
-    let letrasIntroducidas = document.querySelectorAll('.palabra-adivinar p'); //Guardo en un node list las p que hay en el contenedor de palabra oculta
+    let campoPalabraAdivinar = document.querySelectorAll('.palabra-adivinar p'); //Guardo en un node list las p que hay en el contenedor de palabra oculta
     // Iteramos el la palabra oculta transofrmada en un array de caracteres
-    Array.from(palabraOculta).forEach((letraActual, indice) => {
-        if (letraActual === letraIntroducida.innerText) {
-            letrasIntroducidas[indice].innerText = letraIntroducida.innerText 
-            letrasCorrectas.push(letraIntroducida);
+    Array.from(palabraOculta).forEach((letraPalabraOculta, indice) => {
+        if (letraPalabraOculta === letraIntroducida.innerText) {
+            campoPalabraAdivinar[indice].innerText = letraIntroducida.innerText 
+            letrasCorrectas.push(letraIntroducida.innerText);
         }
     });
     
@@ -135,9 +133,7 @@ function letraCorrecta(letraIntroducida, posicion){
 function letraIncorrecta(letra) {
     // Verificamos que la letra que hemos elegido no sea una que ya hemos introducido anteriormente
     if (!letra.classList.contains('incorrecto')){
-
         letra.classList.add('incorrecto'); // Le aplicamos el estilo de incorrecto (fondo rojo)
-     
         actualizarErrores();
     }
 }
@@ -156,13 +152,14 @@ function perder() {
 // FUNCIÓN PARA GUARDAR RESULTADO
 function guardarResultado(estado) {
     let indiceUsuario;
-    let existeUsuario = ranking.jugadores.forEach((usuario, index) => { // Comprobamos si existe el usuario haciendo un foreach al ranking
+    let existeUsuario = false;
+
+    ranking.jugadores.forEach((usuario, index) => { // Comprobamos si existe el usuario haciendo un foreach al ranking
         if(usuario.nombre === nombreUsuario) {
             indiceUsuario = index;
-            return true
+            existeUsuario = true;
         };  //Si el nombre que hay en el ranking coincide con el que ha introducido el usuario devolvemos true
     });
-    console.log(existeUsuario);
     // Si no existe el usuario hacemos un push al array ranking con la información de la partida realizada
     if (!existeUsuario) {
         ranking.jugadores.push({"nombre":nombreUsuario, "estado":estado, "palabra":palabraOculta, "numeroErrores":+numeroErrores.textContent, "tiempo":segundosTotales});
@@ -171,7 +168,8 @@ function guardarResultado(estado) {
     }
 
     let marcaAnterior = ranking.jugadores[indiceUsuario].tiempo;
-    if(marcaAnterior < segundosTotales) {
+    console.log(marcaAnterior);
+    if(marcaAnterior > segundosTotales) {
         ranking.jugadores[indiceUsuario].palabra = palabraOculta;
         ranking.jugadores[indiceUsuario].numeroErrores = +numeroErrores.textContent;
         ranking.jugadores[indiceUsuario].tiempo = segundosTotales;
@@ -206,7 +204,6 @@ botonPerder.addEventListener('click', () => {
 
 formularioNombre.addEventListener('submit', (e) => {
     e.preventDefault();
-    
     
     if (verificarLongitud() & esObligatorio()){
         modalNombreUsuario.style.display = "none";
