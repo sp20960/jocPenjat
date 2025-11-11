@@ -1,8 +1,6 @@
 // GUARDAMOS TODAS LAS CONSTANTES Y VARIABLES GLOBALES QUE UTILIZAREMOS
-const diccionarioPalabras = ["amor", "amistad", "alegría", "aventura", "belleza", "cielo", "camino", "destino", 
-    "esfuerzo", "esperanza", "familia", "fuerza", "gracia", "hogar", "honor", "ilusión", 
-    "justicia", "libertad", "luz", "mar", "naturaleza", "nube", "paz", "perdón"];
-const palabraOculta = diccionarioPalabras[Math.floor(Math.random() * diccionarioPalabras.length)].toUpperCase();
+const urlPalabrasEndpoint = "http://localhost:3000/palabras";
+let palabraOculta = "";
 const numeroIntentos = document.getElementById('numero-intentos');
 const campoPalabraAdivinar = document.querySelector('.palabra-adivinar');
 const abecedario = document.querySelector('.abecedario');
@@ -22,8 +20,6 @@ let intervalo;
 let segundosTotales = 0;
 // FUNCIONES
 
-console.log(palabraOculta);
-
 // FUNCION PARA RELLENAR CON GUIONES BAJOS EL CONTENEDOR DONDE SE IRA PONIENDO LAS LETRAS DE LA PALABRA OCULTA
 function llenarCampoPalabraAdivinar() {
     // GUARDO LA LONGITUD DE LA PALABRA OCULTA PARA EL FOR
@@ -36,6 +32,20 @@ function llenarCampoPalabraAdivinar() {
         let elemento = document.createElement('p') // Creo un elemento p
         campoPalabraAdivinar.append(elemento); // El elemento p lo anido al contenedor de la palabra oculta
         elemento.innerText = "_";
+    }
+}
+
+function llenarLeaderBoard(){
+    let leaderboard = document.getElementById('leaderboard');
+    if(ranking.jugadores.length != 0){
+        leaderboard.innerHTML = ranking.jugadores
+        .map((jugador) => 
+            `
+            <p>Nombre: ${jugador.nombre} ------------ Palabra: ${jugador.palabra} ----------- Errores: ${jugador.numeroErrores} ----------- Tiempo: ${jugador.tiempo}
+        `
+        ).join("")
+    } else {
+        leaderboard.innerHTML="<p>No hay jugadores registrados<p>"
     }
 }
 
@@ -56,6 +66,19 @@ function esObligatorio() {
     }
 
     return true;
+}
+
+async function elegirPalabraOculta(tematica){
+    fetch(urlPalabrasEndpoint)
+    .then((resolve) => resolve.json())
+    .then((datos) => {
+        let palabras = datos[tematica];
+        palabraOculta = palabras[Math.floor(Math.random() * palabras.length)].toUpperCase();
+        console.log(palabraOculta);
+        llenarCampoPalabraAdivinar()
+    })
+    .catch((error) => console.log(error))
+    
 }
 
 // FUNCION PARA INCIIAR EL CRONOMETRO
@@ -93,7 +116,7 @@ function actualizarErrores() {
     numeroIntentos.innerText = +numeroIntentos.innerText - 1;
 
     // Si el número de errores es igual a 4 pierdes
-    if(+numeroErrores.innerText === 4) {
+    if(+numeroErrores.innerText === 8) {
         perder();
     }
 
@@ -168,8 +191,9 @@ function guardarResultado(estado) {
     }
 
     let marcaAnterior = ranking.jugadores[indiceUsuario].tiempo;
+    let erroresAnterior = ranking.jugadores[indiceUsuario].numeroErrores;
     console.log(marcaAnterior);
-    if(marcaAnterior > segundosTotales) {
+    if(marcaAnterior > segundosTotales && erroresAnterior > +numeroErrores.textContent) {
         ranking.jugadores[indiceUsuario].palabra = palabraOculta;
         ranking.jugadores[indiceUsuario].numeroErrores = +numeroErrores.textContent;
         ranking.jugadores[indiceUsuario].tiempo = segundosTotales;
@@ -206,11 +230,13 @@ formularioNombre.addEventListener('submit', (e) => {
     e.preventDefault();
     
     if (verificarLongitud() & esObligatorio()){
+        elegirPalabraOculta(document.getElementById('tematica-palabras').value);
         modalNombreUsuario.style.display = "none";
         nombreUsuario = inputUsuario.value
         formularioNombre.reset();
     }
-})
+});
 
-llenarCampoPalabraAdivinar();
+llenarLeaderBoard();
+
 
