@@ -16,7 +16,8 @@ const botonGanar = document.querySelector('.modal-ganar button');
 const botonPerder = document.querySelector('.modal-perder button');
 let ranking = JSON.parse(localStorage.getItem("ranking")) || {"jugadores": []};
 let cronometroIniciado = false;
-let intervalo;
+let intervaloCronometro;
+let intervaloTemporizador;
 let segundosTotales = 0;
 // FUNCIONES
 
@@ -48,7 +49,6 @@ function llenarLeaderBoard(){
         leaderboard.innerHTML="<p>No hay jugadores registrados<p>"
     }
 }
-
 
 function verificarLongitud() {
     if (inputUsuario.value.trim().length > 8 || inputUsuario.value.trim().length <= 2) {
@@ -84,7 +84,7 @@ async function elegirPalabraOculta(tematica){
 // FUNCION PARA INCIIAR EL CRONOMETRO
 function iniciarCronometro() {
     cronometroIniciado = true; //Indico que el coronometro ya esta iniciado para no vovler a iniciarlo
-    intervalo = setInterval(() => {
+    intervaloCronometro = setInterval(() => {
         segundosTotales++; // Incremento los segundos por cada segundo que pasa
         let horas = Math.floor(segundosTotales / 3600); 
         let minutos = Math.floor((segundosTotales % 3600) / 60);
@@ -100,10 +100,22 @@ function iniciarCronometro() {
     }, 1000) 
 }
 
+function iniciarTemporizador(){
+    document.querySelector('#temporizador span').innetText = "10";
+    intervaloTemporizador = setInterval(() => {
+        let segundosTemporizador = document.querySelector('#temporizador span')
+        if(+segundosTemporizador.innerText === 0){
+            actualizarErrores();
+            segundosTemporizador.innerText = "10";
+        }
+        segundosTemporizador.innerText = +segundosTemporizador.innerText - 1;
+    }, 1000)
+}
+
 // FUNCION PARA DETENER EL CRONOMETRO
 function detenerCronometro() {
     // Paro el cronometro y incido que el cronometro esta en false para poder inciarlo otra vez en la siguiente partida
-    clearInterval(intervalo);
+    clearInterval(iniciarCronometro);
     cronometroIniciado = false;
 }
 
@@ -209,13 +221,14 @@ abecedario.addEventListener('click', (e) => {
         iniciarCronometro();
     }
 
+    iniciarTemporizador();
+
     if (e.target.classList.contains('letra')
         && !e.target.classList.contains('error')
         && !e.target.classList.contains('correcto')){
 
         verificarLetra(e.target);
     }
-
 })
 
 botonGanar.addEventListener('click', () => {
