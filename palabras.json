@@ -1,7 +1,7 @@
 {
     "palabras":{
-        "deportes":["messi", "lebron", "voley", "baloncesto"],
-        "videojuegos":["consola", "nintendo", "playstation"]
+        "deportes":["messi", "lebron", "voleibol", "baloncesto"],
+        "videojuegos":["zelda", "nintendo", "mario"]
     }
     
 }

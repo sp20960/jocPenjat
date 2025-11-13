@@ -10,21 +10,23 @@
     <main>
         <div id="container-jugador">
             <div>
-                <p>Introduzca un nombre cualquiera</p>
-                <form action="#" id="formulario-nombre">
-                    <input type="text" placeholder="Nombre del jugador" id="nombre-usuario">
-                    <p id="mensaje-error"></p>
-                    <label for="tematica-palabras">Tematica de las palabras</label>
-                    <select id="tematica-palabras">
-                        <option value="videojuegos">Videojuegos</option>
-                        <option value="deportes">Deportes</option>
-                    </select>
-                    <input type="submit" value="Acceptar">
-                </form>
+                <div>
+                    <form action="#" id="formulario-nombre">
+                        <label for="nombre-usuario">Introduzca un nombre cualquiera</label>
+                        <input type="text" placeholder="Nombre del jugador" id="nombre-usuario">
+                        <p id="mensaje-error"></p>
+                        <label for="tematica-palabras">Tematica de las palabras</label>
+                        <select id="tematica-palabras">
+                            <option value="videojuegos">Videojuegos</option>
+                            <option value="deportes">Deportes</option>
+                        </select>
+                        <button type="submit">Entrar</button>
+                    </form>
+                </div>
             </div>
         </div>
         <h1>El Joc del Penjat</h1>
-        <p>Selecciona una lletra, li queden <span id="numero-intentos">8</span> intents</p>
+        <p>Selecciona una lletra, li queden <span id="numero-intentos">6</span> intents</p>
         <div class="palabra-adivinar">
            
         </div>
@@ -80,8 +82,11 @@
                 <button>Acceptar</button>
             </div>
         </div>
-        <div id="leaderboard">
+        <div id="container-leaderboard">
+            <h2>Leaderboard</h2>
+            <div id="leaderboard">
 
+            </div>
         </div>
     </main>
     <script src="script.js"></script>

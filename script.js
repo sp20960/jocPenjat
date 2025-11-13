@@ -16,6 +16,7 @@ const botonGanar = document.querySelector('.modal-ganar button');
 const botonPerder = document.querySelector('.modal-perder button');
 let ranking = JSON.parse(localStorage.getItem("ranking")) || {"jugadores": []};
 let cronometroIniciado = false;
+let temporizadorIniciado = false;
 let intervaloCronometro;
 let intervaloTemporizador;
 let segundosTotales = 0;
@@ -101,12 +102,15 @@ function iniciarCronometro() {
 }
 
 function iniciarTemporizador(){
-    document.querySelector('#temporizador span').innetText = "10";
+    temporizadorIniciado = true;
+    document.querySelector('#temporizador span').innerText = "10";
+    reiniciarTemporizador();
+
     intervaloTemporizador = setInterval(() => {
         let segundosTemporizador = document.querySelector('#temporizador span')
         if(+segundosTemporizador.innerText === 0){
             actualizarErrores();
-            segundosTemporizador.innerText = "10";
+            iniciarTemporizador();
         }
         segundosTemporizador.innerText = +segundosTemporizador.innerText - 1;
     }, 1000)
@@ -115,8 +119,14 @@ function iniciarTemporizador(){
 // FUNCION PARA DETENER EL CRONOMETRO
 function detenerCronometro() {
     // Paro el cronometro y incido que el cronometro esta en false para poder inciarlo otra vez en la siguiente partida
-    clearInterval(iniciarCronometro);
+    clearInterval(intervaloCronometro);
     cronometroIniciado = false;
+}
+
+function reiniciarTemporizador(){
+    
+    clearInterval(intervaloTemporizador);
+    temporizadorIniciado = false;
 }
 
 // FUNCION PARA ACTUALIZAR LOS NÚMERO DE ERRORES Y NÚMERO DE INTENTOS
@@ -127,8 +137,8 @@ function actualizarErrores() {
     // Decremento los intentos 
     numeroIntentos.innerText = +numeroIntentos.innerText - 1;
 
-    // Si el número de errores es igual a 4 pierdes
-    if(+numeroErrores.innerText === 8) {
+    // Si el número de errores es igual a 6 pierdes
+    if(+numeroErrores.innerText === 6) {
         perder();
     }
 
@@ -217,11 +227,15 @@ function guardarResultado(estado) {
 // EVENTOS
 abecedario.addEventListener('click', (e) => {
     
+    reiniciarTemporizador();
+
     if(!cronometroIniciado) {
         iniciarCronometro();
     }
-
-    iniciarTemporizador();
+     
+    if(!temporizadorIniciado) {
+        iniciarTemporizador();
+    }
 
     if (e.target.classList.contains('letra')
         && !e.target.classList.contains('error')
@@ -251,5 +265,3 @@ formularioNombre.addEventListener('submit', (e) => {
 });
 
 llenarLeaderBoard();
-
-
